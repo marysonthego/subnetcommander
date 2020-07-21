@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
+import { Button } from 'react-native-paper';
 
 class HomeView extends Component {
   constructor(props) {
@@ -30,17 +31,22 @@ class HomeView extends Component {
         </View>
       );
     }
-    return <View />;
+    return <View><Text>HomeView Default</Text></View>;
   }
 
   render() {
     console.log(`state = ${JSON.stringify(this.state)}`);
     return (
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', width: 700, height: 100 }}>
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', width: 900, height: 100 }}>
         {this.buildInput({ position: 'octet1', placeholder: this.state.octet1 })}
         {this.buildInput({ position: 'octet2', placeholder: this.state.octet2 })}
         {this.buildInput({ position: 'octet3', placeholder: this.state.octet3 })}
         {this.buildInput({ position: 'octet4', placeholder: this.state.octet4 })}
+        <Button
+          mode="contained" icon="sitemap"
+          onPress={() => this.props.navigation.navigate("Details")}>
+            Details
+        </Button>
       </View>
     );
   }
@@ -52,13 +58,13 @@ const styles = StyleSheet.create({
     borderColor: '#2657d3',
     borderWidth: 1,
     fontWeight: 'normal',
-    fontSize: 14,
+    fontSize: 24,
     textAlign: 'right'  
 
   },
   octetView: {
     height: 40,
-    width: 70
+    width: 50
   }
 });
 export default HomeView;
