@@ -1,70 +1,118 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
-import { Button } from 'react-native-paper';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button, TextInput } from 'react-native-paper';
+import NumberFormat from 'react-number-format';
 
-class HomeView extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      octet1: '192',
-      octet2: '168',
-      octet3: '0',
-      octet4: '1'
-    };
-    this.buildInput = this.buildInput.bind(this);
+
+ const onPressComplete = () => {
+   console.log('onPressComplete');
+
+ };
+
+const HomeView = ({ navigation }) => {
+
+  const [addressData, setAddressData] = useState({
+    address: initialAddress,
+    cidrMask: initialCidrMask
+  });
+
+  function handleToggleComplete(id) {
+    const newAddress = addressData.address.map((item) => {
+      if (item.id === id) {
+        const updatedAddress = {
+          ...item,
+        };
+        return updatedAddress;
+      }
+      return item;
+    });
+    setAddressData({ ...addressData, address: newAddress});
   }
+  
+  return (
+    <View style={styles.container}>
+      <BuildInput address={addressData.address}/>
+      <TextInput label='CIDR Mask:' mode='flat'
+        value={addressData.cidrMask}/>
 
-  buildInput(props) {
-    if (props) {
-      console.log(`state = ${JSON.stringify(this.state)}`);
-      const octet = props.position;
-      const starter = props.placeholder;
-      return (
-        <View style={styles.octetView}>
-          <TextInput
-            style={styles.input}
-            onChangeText={(text) => this.setState({ octet })}
-            maxLength={3}
-            keyboardType='numeric'
-            placeholder={starter}
-          />
-        </View>
-      );
-    }
-    return <View><Text>HomeView Default</Text></View>;
-  }
+      <Button
+        mode="contained" icon="check-network"
+        onPress={() => onPressComplete()}>
+        Submit
+      </Button>
+      <Button
+        mode="contained" icon="sitemap"
+        onPress={() => navigation.navigate("Details")}>
+        Details
+      </Button>
+    </View >
+  );
+};
 
-  render() {
-    console.log(`state = ${JSON.stringify(this.state)}`);
-    return (
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', width: 900, height: 100 }}>
-        {this.buildInput({ position: 'octet1', placeholder: this.state.octet1 })}
-        {this.buildInput({ position: 'octet2', placeholder: this.state.octet2 })}
-        {this.buildInput({ position: 'octet3', placeholder: this.state.octet3 })}
-        {this.buildInput({ position: 'octet4', placeholder: this.state.octet4 })}
-        <Button
-          mode="contained" icon="sitemap"
-          onPress={() => this.props.navigation.navigate("Details")}>
-            Details
-        </Button>
-      </View>
-    );
-  }
-}
+  const BuildInput = ({ address }) => (
+    <View style={styles.address}>
+      {address.map((item) => (
+        <TextInput key={item.id}
+          mode='flat'
+          value={item.value}
+          render={props =>
+            <NumberFormat
+              {...props}
+              customInput={TextInput}
+              displayType='input'
+              type='tel'
+              isNumericString={true}
+              decimalScale={0}
+              allowLeadingZeros={true}
+              format='###'
+              allowEmptyFormatting
+              mask='_'
+              value={props.value}
+              onValueChange={(values) => {
+                const {value} = values;
+                handleToggleComplete({ id: item.id, value: value });
+              }}
+            />
+          }
+        />
+      ))}
+    </View>
+  );
 
-const styles = StyleSheet.create({
-  input: {
-    color: '#04194e',
-    borderColor: '#2657d3',
-    borderWidth: 1,
-    fontWeight: 'normal',
-    fontSize: 24,
-    textAlign: 'right'  
+  const initialAddress = [
+    {
+      id: 'octet1',
+      value: '192'
+    },
+    {
+      id: 'octet2',
+      value: '168'
+    },
+    {
+      id: 'octet3',
+      value: '0'
+    },
+    {
+      id: 'octet4',
+      value: '1'
+    }];
+  
+    const initialCidrMask = '/24';
 
-  },
-  octetView: {
-    height: 40,
-    width: 50
-  }
-});
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      alignItems: "center",
+      //marginTop: 20,
+      //padding: 10,
+    },
+    address: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "flex-start",
+    },
+  });
+
 export default HomeView;
