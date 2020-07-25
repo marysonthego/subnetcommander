@@ -38,33 +38,30 @@ const HomeView = ({ navigation }) => {
     <View style={styles.address}>
       {address.map((item) => (
         <NumberFormat key={item.id}
-          displayType='input'
+          displayType={'input'}
           type='tel'
           isNumericString={true}
           decimalScale={0}
           allowLeadingZeros={true}
           format='###'
-          
           mask='_'
           allowEmptyFormatting={true}
           selectTextOnFocus={true}
           value={item.value}
+          onValueChange={(values) => {
+            handleToggleComplete({id: item.id, value: values.value});
+          }}
           customInput={TextInput}
-          mode='flat'
-          keyboardType='number-pad'
-          text={item.value}
-          selectTextOnFocus={true}
-          textAlign='right'
-          maxLength={3}
-          onChangeText={(text) => { 
-            handleToggleComplete({ id: item.id, value: text });
+          inputRef = {(el) => this.inputElem = el}
+          onChangeText={(el) => {
+            handleToggleComplete({ id: item.id, value: el.value });
           }}
         />
       ))}
       <TextInput mode='flat' 
         selectTextOnFocus={true}
         maxLength={3}
-        text={cidrMask}
+        defaultText={cidrMask}
         onChangeText={(text) => {
           handleToggleComplete({ cidrMask: text });
         }}
