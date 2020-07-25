@@ -16,30 +16,71 @@ const HomeView = ({ navigation }) => {
     cidrMask: initialCidrMask
   });
 
-  const handleToggleComplete = (id) => {
-    const newAddress = addressData.address.map((item) => {
-      if (item.id === id) {
-        const updatedAddress = {
-          ...item,
-        };
-        return updatedAddress;
-      }
-      return item;
-    });
-    setAddressData({ ...addressData, address: newAddress });
+  const handleToggleComplete = ({id = -1, value = -1, cidrMask = ''}) => {
+    if (id > -1 && value > -1) {
+      const newAddress = addressData.address.map((item) => {
+        if (item.id === id) {
+          const updatedAddress = {
+            ...item, value: value
+          };
+          return updatedAddress;
+        }
+        return item;
+      });
+      setAddressData({ ...addressData, address: newAddress });
+    }
+    if (cidrMask) {
+      setAddressData({ ...addressData, cidrMask: cidrMask });
+    } 
   }
 
+  const BuildInput = ({ address, cidrMask }) => (
+    <View style={styles.address}>
+      {address.map((item) => (
+        <NumberFormat key={item.id}
+          displayType='input'
+          type='tel'
+          isNumericString={true}
+          decimalScale={0}
+          allowLeadingZeros={true}
+          format='###'
+          
+          mask='_'
+          allowEmptyFormatting={true}
+          selectTextOnFocus={true}
+          value={item.value}
+          customInput={TextInput}
+          mode='flat'
+          keyboardType='number-pad'
+          text={item.value}
+          selectTextOnFocus={true}
+          textAlign='right'
+          maxLength={3}
+          onChangeText={(text) => { 
+            handleToggleComplete({ id: item.id, value: text });
+          }}
+        />
+      ))}
+      <TextInput mode='flat' 
+        selectTextOnFocus={true}
+        maxLength={3}
+        text={cidrMask}
+        onChangeText={(text) => {
+          handleToggleComplete({ cidrMask: text });
+        }}
+      />
+    </View>
+  );
+  
   return (
     <View style={styles.container}>
-      <BuildInput address={addressData.address} />
-      <TextInput label='CIDR Mask:' mode='flat'
-        value={addressData.cidrMask} />
+      <BuildInput address={addressData.address} cidrMask={addressData.cidrMask} />
       <View style={styles.buttons}>
         <Button
           mode="contained" icon="check-network"
           onPress={() => onPressComplete()}>
           Submit
-      </Button>
+        </Button>
         <Button
           mode="contained" icon="sitemap"
           onPress={() => navigation.navigate("Details")}>
@@ -50,35 +91,6 @@ const HomeView = ({ navigation }) => {
   );
 };
 
-const BuildInput = ({ address }) => (
-  <View style={styles.address}>
-    {address.map((item) => (
-      <TextInput key={item.id}
-        mode='flat'
-        value={item.value}
-        render={props =>
-          <NumberFormat
-            {...props}
-            customInput={TextInput}
-            displayType='input'
-            type='tel'
-            isNumericString={true}
-            decimalScale={0}
-            allowLeadingZeros={true}
-            format='###'
-            allowEmptyFormatting={true}
-            mask='_'
-            value={props.value}
-            onValueChange={(values) => {
-              const { value } = values;
-              handleToggleComplete({ id: item.id, value: value });
-            }}
-          />
-        }
-      />
-    ))}
-  </View>
-);
 
 const initialAddress = [
   {
@@ -104,24 +116,60 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    alignItems: "flex-start",
-    alignContent: "stretch",
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+    alignItems: "stretch",
     marginTop: 10,
   },
   address: {
-    flex: 1,
+    flex: 2,
     flexDirection: "row",
     justifyContent: "flex-start",
-    alignContent: "stretch",
+    alignItems: "flex-start",
+    alignContent: "flex-start",
     marginTop: 10,
+    height: 40,
   },
   buttons: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
+    alignItems: 'flex-end',
+    marginTop: 10,
+    height: 40,
+    width: 400,
   }
 });
 
 export default HomeView;
+
+//The global variable undefined is read-only
+// const BuildInput = ({ address }) => (
+//   <View style={styles.address}>
+//     {address.map((item) => (
+//       <TextInput key={item.id}
+//         mode='flat'
+//         value={item.value}
+//         render={props =>
+//           <NumberFormat
+//             {...props}
+//             customInput={TextInput}
+//             displayType='input'
+//             type='tel'
+//             isNumericString={true}
+//             decimalScale={0}
+//             allowLeadingZeros={true}
+//             format='###'
+//             allowEmptyFormatting={true}
+//             mask='_'
+//             value={props.value}
+//             onValueChange={(values) => {
+//               const { value, value } = values;
+//               handleToggleComplete({ id: item.id, value: value });
+//             }}
+//           />
+//         }
+//       />
+//     ))}
+//   </View>
+// );
