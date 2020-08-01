@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
+import { StyleSheet, View, TextInput } from 'react-native';
+import { Button } from 'react-native-paper';
 import NumberFormat from 'react-number-format';
 
 
@@ -37,32 +37,27 @@ const HomeView = ({ navigation }) => {
   const BuildInput = ({ address, cidrMask }) => (
     <View style={styles.address}>
       {address.map((item) => (
-        <NumberFormat key={item.id}
-          displayType={'input'}
-          type='tel'
-          isNumericString={true}
-          decimalScale={0}
-          allowLeadingZeros={true}
-          format='###'
-          mask='_'
-          allowEmptyFormatting={true}
+        <TextInput key={item.id}
           selectTextOnFocus={true}
-          value={item.value}
-          onValueChange={(values) => {
-            handleToggleComplete({id: item.id, value: values.value});
-          }}
-          customInput={TextInput}
-          inputRef = {(el) => this.inputElem = el}
-          onChangeText={(el) => {
-            handleToggleComplete({ id: item.id, value: el.value });
+          maxLength={3}
+          keyboardType='numeric'
+          returnKeyType='next'
+          textAlign='right'
+          placeholder={item.value}
+          blurOnSubmit={false}
+          onSubmitEditing={() => {
+            handleToggleComplete({id: item.id, value: item.value});
           }}
         />
       ))}
-      <TextInput mode='flat' 
+      <TextInput 
         selectTextOnFocus={true}
         maxLength={3}
-        defaultText={cidrMask}
-        onChangeText={(text) => {
+        keyboardType='default'
+        returnKeyType='done'
+        textAlign='right'
+        placeholder={cidrMask}
+        onSubmitEditing={(text) => {
           handleToggleComplete({ cidrMask: text });
         }}
       />
