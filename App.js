@@ -1,7 +1,9 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import { AppearanceProvider, useColorScheme } from 'react-native-appearance';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Main from './Components/MainNavigation';
 import HomeView from './Components/HomeView';
 import DetailsView from './Components/DetailsView';
 
