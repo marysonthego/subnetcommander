@@ -1,77 +1,85 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
-import NumberFormat from 'react-number-format';
-
+import React, { useState, useRef } from 'react';
+import { StyleSheet, View, TextInput } from 'react-native';
+import { Input } from 'react-native-elements';
+import { Button } from 'react-native-paper';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
-
 };
 
 const HomeView = ({ navigation }) => {
-
+  
   const [addressData, setAddressData] = useState({
     address: initialAddress,
-    cidrMask: initialCidrMask
+    cidrMask: initialCidrMask,
+    ref: ref_cidr
   });
 
-  const handleToggleComplete = ({id = -1, value = -1, cidrMask = ''}) => {
-    if (id > -1 && value > -1) {
-      const newAddress = addressData.address.map((item) => {
-        if (item.id === id) {
-          const updatedAddress = {
-            ...item, value: value
-          };
-          return updatedAddress;
-        }
-        return item;
-      });
-      setAddressData({ ...addressData, address: newAddress });
-    }
+  const ref_octet1 = useRef();
+  const ref_octet2 = useRef();
+  const ref_octet3 = useRef();
+  const ref_octet4 = useRef();
+  const ref_cidr = useRef();
+  const textInput = useRef();
+
+
+  const handleToggleComplete = ({id = '', text = '', cidrMask = ''}) => {
+    if (id === '') {
+      return;
+    };
+ 
+    addressData.address.map((item) => {
+      if (item.id === id) {
+        setAddressData({...addressData.address, text: text})
+      };
+    });
+ 
     if (cidrMask) {
-      setAddressData({ ...addressData, cidrMask: cidrMask });
+      setAddressData({ ...addressData, cidrMask: cidrMask })
     } 
+  };
+
+  const focusTextInput = (nextRef) => {
+
+    textInput.current.nextRef.focus();
   }
 
-  const BuildInput = ({ address, cidrMask }) => (
-    <View style={styles.address}>
-      {address.map((item) => (
-        <NumberFormat key={item.id}
-          displayType={'input'}
-          type='tel'
-          isNumericString={true}
-          decimalScale={0}
-          allowLeadingZeros={true}
-          format='###'
-          mask='_'
-          allowEmptyFormatting={true}
-          selectTextOnFocus={true}
-          value={item.value}
-          onValueChange={(values) => {
-            handleToggleComplete({id: item.id, value: values.value});
-          }}
-          customInput={TextInput}
-          inputRef = {(el) => this.inputElem = el}
-          onChangeText={(el) => {
-            handleToggleComplete({ id: item.id, value: el.value });
-          }}
+  const BuildInput = ({ address, cidrMask }) => {
+
+    return (
+      <View style={styles.address}>
+        {address.map((item) => (
+          <Input key={item.id}
+            keyboardType='number-pad'
+            maxLength={3}
+            selectTextOnFocus={true}
+            defaultValue={item.text}
+            autoFocus={true} 
+            ref={props.ref}
+            nextRef={item.nextRef}
+          onSubmitEditing={() => focusTextInput({nextRef})}
+          blurOnSubmit={false}
+          returnKeyType="next"
         />
+
       ))}
-      <TextInput mode='flat' 
+      <Input 
         selectTextOnFocus={true}
-        maxLength={3}
-        defaultText={cidrMask}
-        onChangeText={(text) => {
+        keyboardType='default'
+        maxLength={2}
+        textAlign='right'
+        onSubmitEditing={(text) => {
           handleToggleComplete({ cidrMask: text });
         }}
+        blurOnSubmit={false}
       />
-    </View>
-  );
+   </View>
+ 
+    );};
   
   return (
     <View style={styles.container}>
-      <BuildInput address={addressData.address} cidrMask={addressData.cidrMask} />
+      <BuildInput {...addressData} ref={el => inputElement = el} />
       <View style={styles.buttons}>
         <Button
           mode="contained" icon="check-network"
@@ -84,39 +92,48 @@ const HomeView = ({ navigation }) => {
           Details
       </Button>
       </View>
-    </View >
+    </View>
   );
 };
-
 
 const initialAddress = [
   {
     id: 'octet1',
-    value: '192'
+    text: '192',
+    ref: 'ref_octet1',
+    nextRef: 'ref_octet2',
   },
   {
     id: 'octet2',
-    value: '168'
+    text: '168',
+    ref: 'ref_octet2',
+    nextRef: 'ref_octet3',
   },
   {
     id: 'octet3',
-    value: '0'
+    text: '0',
+    ref: 'ref_octet3',
+    nextRef: 'ref_octet4',
   },
   {
     id: 'octet4',
-    value: '1'
+    text: '1',
+    ref: 'ref_octet4',
+    nextRef: 'ref_cidr',
   }];
 
-const initialCidrMask = '/24';
+const initialCidrMask = '24';
+const ref = 'ref_cidr';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    flexWrap: "nowrap",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "stretch",
     marginTop: 10,
+    width: 800,
   },
   address: {
     flex: 2,
@@ -126,6 +143,7 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
     marginTop: 10,
     height: 40,
+    width: 60,
   },
   buttons: {
     flex: 1,
@@ -139,34 +157,3 @@ const styles = StyleSheet.create({
 });
 
 export default HomeView;
-
-//The global variable undefined is read-only
-// const BuildInput = ({ address }) => (
-//   <View style={styles.address}>
-//     {address.map((item) => (
-//       <TextInput key={item.id}
-//         mode='flat'
-//         value={item.value}
-//         render={props =>
-//           <NumberFormat
-//             {...props}
-//             customInput={TextInput}
-//             displayType='input'
-//             type='tel'
-//             isNumericString={true}
-//             decimalScale={0}
-//             allowLeadingZeros={true}
-//             format='###'
-//             allowEmptyFormatting={true}
-//             mask='_'
-//             value={props.value}
-//             onValueChange={(values) => {
-//               const { value, value } = values;
-//               handleToggleComplete({ id: item.id, value: value });
-//             }}
-//           />
-//         }
-//       />
-//     ))}
-//   </View>
-// );
