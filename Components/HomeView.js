@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { Button } from 'react-native-paper';
-import NumberFormat from 'react-number-format';
-
 
 const onPressComplete = () => {
   console.log('onPressComplete');
@@ -11,45 +9,45 @@ const onPressComplete = () => {
 
 const HomeView = ({ navigation }) => {
 
-  const [addressData, setAddressData] = useState({
-    address: initialAddress,
+  const [addressState, setAddressState] = useState({
+    addressArray: initialAddressArray,
     cidrMask: initialCidrMask
   });
 
-  const handleToggleComplete = ({id = -1, value = -1, cidrMask = ''}) => {
-    if (id > -1 && value > -1) {
-      const newAddress = addressData.address.map((item) => {
-        if (item.id === id) {
-          const updatedAddress = {
-            ...item, value: value
-          };
-          return updatedAddress;
-        }
-        return item;
-      });
-      setAddressData({ ...addressData, address: newAddress });
-    }
-    if (cidrMask) {
-      setAddressData({ ...addressData, cidrMask: cidrMask });
-    } 
+  const handleToggleComplete = (id, value, cidrMask) => {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> handleToggleComplete');
+    console.log(id, value, cidrMask);
+      if (value) {
+        setAddressState({ ...addressState.addressArray[id], value: value });
+      };
+      if (cidrMask) {
+        setAddressState({ ...addressState, cidrMask: cidrMask });
+      }
   }
 
-  const BuildInput = ({ address, cidrMask }) => (
-    <View style={styles.address}>
-      {address.map((item) => (
-        <TextInput key={item.id}
-          selectTextOnFocus={true}
-          maxLength={3}
-          keyboardType='numeric'
-          returnKeyType='next'
-          textAlign='right'
-          placeholder={item.value}
-          blurOnSubmit={false}
-          onSubmitEditing={() => {
-            handleToggleComplete({id: item.id, value: item.value});
-          }}
-        />
+  const BuildInput = ({newAddressArray, cidrMask}) => {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BuildInput newAddressArray');
+    console.log(newAddressArray);
+    return (
+      <View style={styles.address}>
+      {newAddressArray.map((octet, index) => (
+          <View style={styles.address} key={index}>
+            <TextInput 
+              selectTextOnFocus={true}
+              maxLength={3}
+              keyboardType='numeric'
+              returnKeyType='next'
+              textAlign='right'
+              placeholder={octet.value}
+              blurOnSubmit={false}
+              onSubmitEditing={(event) => {
+                handleToggleComplete({id: octet.id, value: event.nativeEvent.text});
+              }}
+            />
+            <Text>{octet.spacer}</Text>
+        </View>
       ))}
+      
       <TextInput 
         selectTextOnFocus={true}
         maxLength={3}
@@ -57,16 +55,17 @@ const HomeView = ({ navigation }) => {
         returnKeyType='done'
         textAlign='right'
         placeholder={cidrMask}
-        onSubmitEditing={(text) => {
-          handleToggleComplete({ cidrMask: text });
+        onSubmitEditing={(event) => {
+          handleToggleComplete({ cidrMask: event.nativeEvent.text});
         }}
       />
     </View>
-  );
-  
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <BuildInput address={addressData.address} cidrMask={addressData.cidrMask} />
+      <BuildInput newAddressArray={addressState.addressArray} cidrMask={addressState.cidrMask} />
       <View style={styles.buttons}>
         <Button
           mode="contained" icon="check-network"
@@ -84,22 +83,26 @@ const HomeView = ({ navigation }) => {
 };
 
 
-const initialAddress = [
+const initialAddressArray = [
   {
-    id: 'octet1',
-    value: '192'
+    id: 0,
+    value: '192',
+    spacer: '.'
   },
   {
-    id: 'octet2',
-    value: '168'
+    id: 1,
+    value: '168',
+    spacer: '.'
   },
   {
-    id: 'octet3',
-    value: '0'
+    id: 2,
+    value: '0',
+    spacer: '.'
   },
   {
-    id: 'octet4',
-    value: '1'
+    id: 3,
+    value: '1',
+    spacer: ' '
   }];
 
 const initialCidrMask = '/24';
