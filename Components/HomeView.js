@@ -6,6 +6,103 @@ const onPressComplete = () => {
 
 };
 
+const HomeView = ({ navigation }) => {
+  const refArray = [];
+  var newRef = {};
+  const [addressState, setAddressState] = useState({
+    addressArray: initialAddressArray,
+    cidr: initialCidr,
+    id: initialCidrId
+  });
+
+  const handleToggleComplete = (id, value, cidr) => {
+    console.log('>>>>> handleToggleComplete');
+    console.log(id, value, cidr, refArray.length);
+    if (value > -1) {
+      switch (id) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          setAddressState({ ...addressState.addressArray[id], value: value });
+          if (id + 1 < refArray.length) {
+            console.log('You are here')
+            console.log(`id= $id length= $refArray.length`)
+            refArray[id + 1].current.focus();
+          };
+        break;
+      }
+    }
+    if (cidr) {
+      setAddressState({ ...addressState, cidr: cidr, id: id });
+    }
+  };
+
+  const BuildInput = ({ addressArray, cidr }) => {
+    console.log('>>>>>> BuildInput addressArray cidr');
+    console.log(addressArray, cidr);
+    return (
+      <View style={styles.addressRow}>
+        {addressArray.map((octet, index) => (
+          refArray.push(newRef = useRef()),
+          <View style={styles.addressRow} key={index}>
+            <TextInput style={styles.address}
+              ref={newRef}
+              selectTextOnFocus={true}
+              selectionColor="gainsboro"
+              maxLength={3}
+              keyboardType='numeric'
+              returnKeyType='next'
+              textAlign='left'
+              defaultValue={octet.value}
+              blurOnSubmit={false}
+              autoFocus={(octet.id === 0) ? true : false}
+              id={octet.id}
+              onSubmitEditing={(event) => {
+                handleToggleComplete({ id: octet.id, value: event.nativeEvent.text });
+              }}
+            />
+            <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
+          </View>
+        ))}
+
+        <TextInput style={styles.address}
+          selectTextOnFocus={true}
+          selectionColor="gainsboro"
+          maxLength={2}
+          keyboardType='numeric'
+          returnKeyType='done'
+          textAlign='left'
+          defaultValue={cidr}
+          newRef={useRef(null)}
+          arrLength={refArray.push(newRef)}
+          ref={newRef}
+          onSubmitEditing={(event) => {
+            id = 4;
+            cidr = event.nativeEvent.text;
+            console.log(id, cidr);
+            handleToggleComplete({ id: id, cidr: cidr });
+          }}
+        />
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} id={addressState.id} />
+      <View style={styles.buttons}>
+        <Button title="Submit" color="black"
+          onPress={() => onPressComplete()}>
+        </Button>
+        <Button title="Details" color="black"
+          onPress={() => navigation.navigate("Details")}>
+        </Button>
+      </View>
+    </View >
+  );
+};
+
 const initialAddressArray = [
   {
     id: 0,
@@ -29,112 +126,6 @@ const initialAddressArray = [
   }];
 const initialCidr = '24';
 const initialCidrId = 4;
-
-const HomeView = ({ navigation }) => {
-
-  const refArray = [];
-  var newRef = {};
-
-  const [addressState, setAddressState] = useState({
-    addressArray: initialAddressArray,
-    cidr: initialCidr,
-    id: initialCidrId
-  });
-
-  const handleToggleComplete = (id, value, cidr) => {
-    console.log('>>>>> handleToggleComplete');
-    console.log(id, value, cidr);
-
-    if (value) {
-      switch (id) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          setAddressState({ ...addressState.addressArray[id], value: value });
-          if (id + 1 < refArray.length) {
-            refArray[id + 1].current.focus();
-          };
-          break;
-      }
-    }
-
-    if (cidr) {
-      setAddressState({ ...addressState, cidr: cidr, id: id });
-    }
-  };
-
-  const BuildInput = ({ addressArray, cidr }) => {
-    console.log('>>>>>> BuildInput addressArray cidr');
-    console.log(addressArray, cidr);
-    return (
-      <View style={styles.addressRow}>
-      
-        {addressArray.map((octet, index) => (
-          refArray.push(newRef = useRef()),
-         
-          <View style={styles.addressRow} key={index}>
-
-            <TextInput style={styles.address}
-              ref={newRef}
-              selectTextOnFocus={true}
-              selectionColor="gainsboro"
-              maxLength={3}
-              keyboardType='numeric'
-              returnKeyType='next'
-              textAlign='left'
-              defaultValue={octet.value}
-              blurOnSubmit={false}
-              autoFocus={(octet.id === 0) ? true : false}
-              id={octet.id}
-              onSubmitEditing={(event) => {
-                globalValue = event.nativeEvent.text;
-                handleToggleComplete({ id: octet.id, value: globalValue });
-              }}
-            />
-            <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
-          </View>
-        ))}
-
-        <TextInput style={styles.address}
-          selectTextOnFocus={true}
-          selectionColor="gainsboro"
-          maxLength={2}
-          keyboardType='numeric'
-          returnKeyType='done'
-          textAlign='left'
-          defaultValue={cidr}
-          newRef={useRef(null)}
-          arrLength={refArray.push(newRef)}
-          ref={newRef}
-
-          onSubmitEditing={(event) => {
-            id = 4;
-            cidr = event.nativeEvent.text;
-            console.log(id, cidr);
-            handleToggleComplete({ id: id, cidr: cidr });
-          }}
-        />
-       
-      </View>
-    );
-  };
-
-  return (
-    <View style={styles.container}>
-      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} id={addressState.id} />
-      <View style={styles.buttons}>
-        <Button title="Submit" color="black"
-          onPress={() => onPressComplete()}>
-        </Button>
-        <Button title="Details" color="black"
-          onPress={() => navigation.navigate("Details")}>
-        </Button>
-      </View>
-    </View >
-  );
-
-};
 
 const styles = StyleSheet.create({
   container: {
