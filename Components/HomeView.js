@@ -9,97 +9,97 @@ const onPressComplete = () => {
 const HomeView = ({ navigation }) => {
 
   const refArray = [];
-  var globalId = 0;
-  var globalValue = 0;
+  var newRef = '';
+  var arrLength = 0;
 
   const [addressState, setAddressState] = useState({
     addressArray: initialAddressArray,
-    cidr: initialCidr
+    cidr: initialCidr,
+    id: initialCidrId
   });
-
-  useEffect(() => {
-    switch (globalId) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-        setAddressState({ ...addressState.addressArray[globalId], value: globalValue });
-        if (globalId + 1 < refArray.length) {
-          refArray[globalId + 1].focus();
-        };
-        break;
-    }
-  }, [globalId]);
 
   const handleToggleComplete = (id, value, cidr) => {
     console.log('>>>>> handleToggleComplete');
     console.log(id, value, cidr);
 
-    if (cidr) {
-      setAddressState({ ...addressState, cidr: cidr });
+    if (value) {
+      switch (id) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          setAddressState({ ...addressState.addressArray[id], value: value });
+          if (id + 1 < refArray.length) {
+            refArray[id + 1].current.focus();
+          };
+          break;
+      }
     }
-  }
+
+    if (cidr) {
+      setAddressState({ ...addressState, cidr: cidr, id: id });
+    }
+  };
 
   const BuildInput = ({ addressArray, cidr }) => {
     console.log('>>>>>> BuildInput addressArray');
     console.log(addressArray);
-    var newRef = 'myRef';
-    var arrLength = 0;
-
     return (
-
       <View style={styles.addressRow}>
-        <React.Fragment>
-          {addressArray.map((octet, index) => {
-            newRef = useRef();
-            refArray.push(newRef);
-            <View style={styles.addressRow} key={index}>
-              <TextInput style={styles.address}
-                ref={newRef.current}
-                selectTextOnFocus={true}
-                selectionColor="gainsboro"
-                maxLength={3}
-                keyboardType='numeric'
-                returnKeyType='next'
-                textAlign='left'
-                defaultValue={octet.value}
-                blurOnSubmit={false}
-                autoFocus={(octet.id === 0) ? true : false}
-                globalId = {octet.id}
-                onSubmitEditing={(event) => {
-                  globalValue = event.nativeEvent.text;
-                  handleToggleComplete({ id: octet.id, value: globalValue });
-                }}
-              />
-              <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
-            </View>
-          })}
-          <TextInput style={styles.address}
-            selectTextOnFocus={true}
-            selectionColor="gainsboro"
-            maxLength={2}
-            keyboardType='numeric'
-            returnKeyType='done'
-            textAlign='left'
-            defaultValue={cidr}
-            newRef={useRef()}
-            arrLength={refArray.push(newRef)}
-            ref={newRef.current}
-            globalId = {arrLength-1}
-            onSubmitEditing={(event) => {
-              globalValue = event.nativeEvent.text;
-              handleToggleComplete({ id: (arrLength-1), cidr: globalValue });
-            }}
-          />
-        </React.Fragment>
-      </View>
+        <View style={styles.address}>
+        {addressArray.map((octet, index) => {
+          newRef = useRef()
+          refArray.push(newRef);
+          <View style={styles.addressRow}>
 
+            <TextInput style={styles.address} key={index}
+              ref={newRef}
+              selectTextOnFocus={true}
+              selectionColor="gainsboro"
+              maxLength={3}
+              keyboardType='numeric'
+              returnKeyType='next'
+              textAlign='left'
+              defaultValue={octet.value}
+              blurOnSubmit={false}
+              autoFocus={(octet.id === 0) ? true : false}
+              id={octet.id}
+              onSubmitEditing={(event) => {
+                globalValue = event.nativeEvent.text;
+                handleToggleComplete({ id: octet.id, value: globalValue });
+              }}
+            />
+            <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
+          </View>
+        })}
+
+        <TextInput style={styles.address}
+          selectTextOnFocus={true}
+          selectionColor="gainsboro"
+          maxLength={2}
+          keyboardType='numeric'
+          returnKeyType='done'
+          textAlign='left'
+          defaultValue={cidr}
+          newRef={useRef(null)}
+          arrLength={refArray.push(newRef)}
+          ref={newRef}
+
+          onSubmitEditing={(event) => {
+            id = 4;
+            cidr = event.nativeEvent.text;
+            console.log(id, cidr);
+            handleToggleComplete({ id: id, cidr: cidr });
+          }}
+        />
+        </View>
+      </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} />
+      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} id={addressState.id} />
       <View style={styles.buttons}>
         <Button title="Submit" color="black"
           onPress={() => onPressComplete()}>
@@ -134,6 +134,7 @@ const initialAddressArray = [
     spacer: '/'
   }];
 const initialCidr = '24';
+const initialCidrId = 4;
 
 const styles = StyleSheet.create({
   container: {
