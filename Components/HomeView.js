@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput } from 'react-native';
-import { Button } from 'react-native-paper';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
@@ -9,79 +8,109 @@ const onPressComplete = () => {
 
 const HomeView = ({ navigation }) => {
 
+  const refArray = [];
+  var globalId = 0;
+  var globalValue = 0;
+
   const [addressState, setAddressState] = useState({
     addressArray: initialAddressArray,
-    cidrMask: initialCidrMask
+    cidr: initialCidr
   });
 
-  const handleToggleComplete = (id, value, cidrMask) => {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> handleToggleComplete');
-    console.log(id, value, cidrMask);
-      if (value) {
-        setAddressState({ ...addressState.addressArray[id], value: value });
-      };
-      if (cidrMask) {
-        setAddressState({ ...addressState, cidrMask: cidrMask });
-      }
+  useEffect(() => {
+    switch (globalId) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+        setAddressState({ ...addressState.addressArray[globalId], value: globalValue });
+        if (globalId + 1 < refArray.length) {
+          refArray[globalId + 1].focus();
+        };
+        break;
+    }
+  }, [globalId]);
+
+  const handleToggleComplete = (id, value, cidr) => {
+    console.log('>>>>> handleToggleComplete');
+    console.log(id, value, cidr);
+
+    if (cidr) {
+      setAddressState({ ...addressState, cidr: cidr });
+    }
   }
 
-  const BuildInput = ({newAddressArray, cidrMask}) => {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BuildInput newAddressArray');
-    console.log(newAddressArray);
+  const BuildInput = ({ addressArray, cidr }) => {
+    console.log('>>>>>> BuildInput addressArray');
+    console.log(addressArray);
+    var newRef = 'myRef';
+    var arrLength = 0;
+
     return (
-      <View style={styles.address}>
-      {newAddressArray.map((octet, index) => (
-          <View style={styles.address} key={index}>
-            <TextInput 
-              selectTextOnFocus={true}
-              maxLength={3}
-              keyboardType='numeric'
-              returnKeyType='next'
-              textAlign='right'
-              placeholder={octet.value}
-              blurOnSubmit={false}
-              onSubmitEditing={(event) => {
-                handleToggleComplete({id: octet.id, value: event.nativeEvent.text});
-              }}
-            />
-            <Text>{octet.spacer}</Text>
-        </View>
-      ))}
-      
-      <TextInput 
-        selectTextOnFocus={true}
-        maxLength={3}
-        keyboardType='default'
-        returnKeyType='done'
-        textAlign='right'
-        placeholder={cidrMask}
-        onSubmitEditing={(event) => {
-          handleToggleComplete({ cidrMask: event.nativeEvent.text});
-        }}
-      />
-    </View>
+
+      <View style={styles.addressRow}>
+        <React.Fragment>
+          {addressArray.map((octet, index) => {
+            newRef = useRef();
+            refArray.push(newRef);
+            <View style={styles.addressRow} key={index}>
+              <TextInput style={styles.address}
+                ref={newRef.current}
+                selectTextOnFocus={true}
+                selectionColor="gainsboro"
+                maxLength={3}
+                keyboardType='numeric'
+                returnKeyType='next'
+                textAlign='left'
+                defaultValue={octet.value}
+                blurOnSubmit={false}
+                autoFocus={(octet.id === 0) ? true : false}
+                globalId = {octet.id}
+                onSubmitEditing={(event) => {
+                  globalValue = event.nativeEvent.text;
+                  handleToggleComplete({ id: octet.id, value: globalValue });
+                }}
+              />
+              <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
+            </View>
+          })}
+          <TextInput style={styles.address}
+            selectTextOnFocus={true}
+            selectionColor="gainsboro"
+            maxLength={2}
+            keyboardType='numeric'
+            returnKeyType='done'
+            textAlign='left'
+            defaultValue={cidr}
+            newRef={useRef()}
+            arrLength={refArray.push(newRef)}
+            ref={newRef.current}
+            globalId = {arrLength-1}
+            onSubmitEditing={(event) => {
+              globalValue = event.nativeEvent.text;
+              handleToggleComplete({ id: (arrLength-1), cidr: globalValue });
+            }}
+          />
+        </React.Fragment>
+      </View>
+
     );
   };
 
   return (
     <View style={styles.container}>
-      <BuildInput newAddressArray={addressState.addressArray} cidrMask={addressState.cidrMask} />
+      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} />
       <View style={styles.buttons}>
-        <Button
-          mode="contained" icon="check-network"
+        <Button title="Submit" color="black"
           onPress={() => onPressComplete()}>
-          Submit
         </Button>
-        <Button
-          mode="contained" icon="sitemap"
+        <Button title="Details" color="black"
           onPress={() => navigation.navigate("Details")}>
-          Details
-      </Button>
+        </Button>
       </View>
     </View >
   );
 };
-
 
 const initialAddressArray = [
   {
@@ -96,16 +125,15 @@ const initialAddressArray = [
   },
   {
     id: 2,
-    value: '0',
+    value: '000',
     spacer: '.'
   },
   {
     id: 3,
-    value: '1',
-    spacer: ' '
+    value: '001',
+    spacer: '/'
   }];
-
-const initialCidrMask = '/24';
+const initialCidr = '24';
 
 const styles = StyleSheet.create({
   container: {
@@ -113,58 +141,45 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flexWrap: "nowrap",
     justifyContent: "space-between",
-    alignItems: "stretch",
-    marginTop: 10,
+    alignItems: "flex-start",
+    backgroundColor: 'dimgrey',
+  },
+  addressRow: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    height: 30,
+    width: 200,
+    justifyContent: "flex-start",
+    backgroundColor: 'dimgrey',
   },
   address: {
-    flex: 2,
     flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    alignContent: "flex-start",
-    marginTop: 10,
-    height: 40,
+    flexWrap: "nowrap",
+    justifyContent: "center",
+    textAlignVertical: 'bottom',
+    textDecorationLine: 'underline',
+    fontSize: 20,
+    width: 35,
+    height: 30,
+    color: 'black',
+    backgroundColor: 'ghostwhite',
+  },
+  spacer: {
+    justifyContent: "center",
+    textDecorationLine: 'none',
+    backgroundColor: 'ghostwhite',
+    width: 35,
   },
   buttons: {
-    flex: 1,
+    flex: 9,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: 'flex-end',
     marginTop: 10,
-    height: 40,
     width: 400,
+    backgroundColor: 'dimgrey',
   }
 });
 
 export default HomeView;
-
-//The global variable undefined is read-only
-// const BuildInput = ({ address }) => (
-//   <View style={styles.address}>
-//     {address.map((item) => (
-//       <TextInput key={item.id}
-//         mode='flat'
-//         value={item.value}
-//         render={props =>
-//           <NumberFormat
-//             {...props}
-//             customInput={TextInput}
-//             displayType='input'
-//             type='tel'
-//             isNumericString={true}
-//             decimalScale={0}
-//             allowLeadingZeros={true}
-//             format='###'
-//             allowEmptyFormatting={true}
-//             mask='_'
-//             value={props.value}
-//             onValueChange={(values) => {
-//               const { value, value } = values;
-//               handleToggleComplete({ id: item.id, value: value });
-//             }}
-//           />
-//         }
-//       />
-//     ))}
-//   </View>
-// );
