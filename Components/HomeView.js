@@ -15,13 +15,15 @@ const HomeView = ({ navigation }) => {
                       useRef(null),];
 
   const [addressState, setAddressState] = useState(initialAddressArray);
-  const [addressObj, setAddressObj] = useState();
+  const [addressObj, setAddressObj] = useState(addressState);
 
   const updateAddress = ({ id, value }) => {
     console.log(`\nupdateAddress id = ${id} value = ${value}`);
-    setAddressObj((id, value) => {
-      addressObj[id].value = value;
-    });
+
+    setAddressObj((id, value) => {addressState.map((id) => { 
+      if (addressState.id === id) {
+        addressState.value = value};}
+      )});
     console.log(`\nupdateAddress addressObj = ${JSON.stringify(addressState)}`);
   };
 
@@ -39,7 +41,7 @@ const HomeView = ({ navigation }) => {
   };
 
   const BuildInput = () => {
-
+    var next =0;
     (addressState ? addressArray = Array.from(addressState) :
       addressArray = Array.from(initialAddressArray));
     var next = 0;
@@ -59,7 +61,7 @@ const HomeView = ({ navigation }) => {
               autoFocus={item.id === 0 ? true : false}
               maxLength={item.type === 'octet' ? 3 : 2}
               returnKeyType={item.type === 'octet' ? 'next' : 'done'}
-              next = {item.id + 1}
+              
               ref={ref => { refArray[item.id].current = ref }}
               
               onLayout= {(event) => {
@@ -67,8 +69,9 @@ const HomeView = ({ navigation }) => {
                 console.log(`onLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
               }}
               onSubmitEditing={(event) => {
-                console.log(`\nonSubmitEditing id= ${item.id}, nativeEvent.text= ${event.nativeEvent.text}`);
-                refArray[next].current.focus();
+                next=(item.id < 4 ? item.id + 1 : item.id);
+                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.text= ${event.nativeEvent.text} next = ${next}`);
+                 refArray[next].current.focus();
                 handleToggleComplete({ id: item.id, value: event.nativeEvent.text });
               }}
             />
