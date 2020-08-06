@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, createRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
 const onPressComplete = () => {
@@ -7,95 +7,119 @@ const onPressComplete = () => {
 };
 
 const HomeView = ({ navigation }) => {
-  const refArray = [];
-  var newRef = {};
-  const [addressState, setAddressState] = useState({
-    addressArray: initialAddressArray,
-    cidr: initialCidr,
-    id: initialCidrId
-  });
+  var addressArray = [];
+  var refArray = [useRef(null),
+                      useRef(null),
+                      useRef(null),
+                      useRef(null),
+                      useRef(null),];
 
-  const handleToggleComplete = (id, value, cidr) => {
+  const [addressState, setAddressState] = useState(initialAddressArray);
+  const [addressObj, setAddressObj] = useState();
+
+  const updateAddress = ({ id, value }) => {
+    console.log(`\nupdateAddress id = ${id} value = ${value}`);
+    setAddressObj((id, value) => {
+      addressObj[id].value = value;
+    });
+    console.log(`\nupdateAddress addressObj = ${JSON.stringify(addressState)}`);
+  };
+
+  useLayoutEffect(() => {
+    setAddressState(initialAddressArray);
+    console.log(`\nuseLayoutEffect addressState = ${JSON.stringify(addressState)}`);
+  }, []);
+
+  const handleToggleComplete = ({ id, value }) => {
     console.log('>>>>> handleToggleComplete');
-    console.log(id, value, cidr, refArray.length);
+    console.log(`id= ${id}, value= ${value}, length= ${refArray.length}`);
     if (value > -1) {
-      switch (id) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          setAddressState({ ...addressState.addressArray[id], value: value });
-          if (id + 1 < refArray.length) {
-            console.log('You are here')
-            console.log(`id= $id length= $refArray.length`)
-            refArray[id + 1].current.focus();
-          };
-        break;
-      }
-    }
-    if (cidr) {
-      setAddressState({ ...addressState, cidr: cidr, id: id });
+      updateAddress({ id, value });
     }
   };
 
-  const BuildInput = ({ addressArray, cidr }) => {
-    console.log('>>>>>> BuildInput addressArray cidr');
-    console.log(addressArray, cidr);
+  const BuildInput = () => {
+
+    (addressState ? addressArray = Array.from(addressState) :
+      addressArray = Array.from(initialAddressArray));
+    var next = 0;
+    console.log(`\nBuildInput \naddressArray = ${JSON.stringify(addressArray)}\n\naddressState = ${JSON.stringify(addressState)}`);
     return (
       <View style={styles.addressRow}>
-        {addressArray.map((octet, index) => (
-          refArray.push(newRef = useRef()),
-          <View style={styles.addressRow} key={index}>
-            <TextInput style={styles.address}
-              ref={newRef}
+        {addressArray.map((item) => (
+          <View style={styles.address} key={item.id}>
+            <TextInput style={[styles.address, styles.textInput]}
               selectTextOnFocus={true}
               selectionColor="gainsboro"
-              maxLength={3}
               keyboardType='numeric'
-              returnKeyType='next'
               textAlign='left'
-              defaultValue={octet.value}
+              placeholder={item.value}
+              placeholderTextColor='grey'
               blurOnSubmit={false}
-              autoFocus={(octet.id === 0) ? true : false}
-              id={octet.id}
+              autoFocus={item.id === 0 ? true : false}
+              maxLength={item.type === 'octet' ? 3 : 2}
+              returnKeyType={item.type === 'octet' ? 'next' : 'done'}
+              next = {item.id + 1}
+              ref={ref => { refArray[item.id].current = ref }}
+              
+              onLayout= {(event) => {
+                autofocus='true'
+                console.log(`onLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
+              }}
               onSubmitEditing={(event) => {
-                handleToggleComplete({ id: octet.id, value: event.nativeEvent.text });
+                console.log(`\nonSubmitEditing id= ${item.id}, nativeEvent.text= ${event.nativeEvent.text}`);
+                refArray[next].current.focus();
+                handleToggleComplete({ id: item.id, value: event.nativeEvent.text });
               }}
             />
-            <Text style={[styles.address, styles.spacer]}>{octet.spacer}</Text>
+            <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
           </View>
         ))}
-
-        <TextInput style={styles.address}
-          selectTextOnFocus={true}
-          selectionColor="gainsboro"
-          maxLength={2}
-          keyboardType='numeric'
-          returnKeyType='done'
-          textAlign='left'
-          defaultValue={cidr}
-          newRef={useRef(null)}
-          arrLength={refArray.push(newRef)}
-          ref={newRef}
-          onSubmitEditing={(event) => {
-            id = 4;
-            cidr = event.nativeEvent.text;
-            console.log(id, cidr);
-            handleToggleComplete({ id: id, cidr: cidr });
-          }}
-        />
       </View>
     );
   };
 
+  const initialAddressArray = [
+    {
+      id: 0,
+      type: 'octet',
+      value: '192',
+      spacer: '.'
+    },
+    {
+      id: 1,
+      type: 'octet',
+      value: '168',
+      spacer: '.'
+    },
+    {
+      id: 2,
+      type: 'octet',
+      value: '000',
+      spacer: '.'
+    },
+    {
+      id: 3,
+      type: 'octet',
+      value: '001',
+      spacer: '/'
+    },
+    {
+      id: 4,
+      type: 'cidr',
+      value: '24',
+      spacer: ''
+    }];
+
+
   return (
     <View style={styles.container}>
-      <BuildInput addressArray={addressState.addressArray} cidr={addressState.cidr} id={addressState.id} />
+      <BuildInput />
       <View style={styles.buttons}>
-        <Button title="Submit" color="black"
+        <Button title="Submit" color="grey"
           onPress={() => onPressComplete()}>
         </Button>
-        <Button title="Details" color="black"
+        <Button title="Details" color="grey"
           onPress={() => navigation.navigate("Details")}>
         </Button>
       </View>
@@ -103,74 +127,57 @@ const HomeView = ({ navigation }) => {
   );
 };
 
-const initialAddressArray = [
-  {
-    id: 0,
-    value: '192',
-    spacer: '.'
-  },
-  {
-    id: 1,
-    value: '168',
-    spacer: '.'
-  },
-  {
-    id: 2,
-    value: '000',
-    spacer: '.'
-  },
-  {
-    id: 3,
-    value: '001',
-    spacer: '/'
-  }];
-const initialCidr = '24';
-const initialCidrId = 4;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
     flexWrap: "nowrap",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    backgroundColor: 'dimgrey',
+    padding: 10,
+    justifyContent: "flex-start",
+    //alignItems: "flex-start",
+    backgroundColor: 'grey',
   },
   addressRow: {
-    flex: 1,
+    //flex: 1,
     flexDirection: "row",
     flexWrap: "nowrap",
-    height: 30,
-    width: 200,
+    //padding: 10,
+    height: 40,
+    width: '75%',
     justifyContent: "flex-start",
-    backgroundColor: 'dimgrey',
+    //backgroundColor: 'dimgrey',
+    backgroundColor: 'cyan',
   },
   address: {
+    //flex: 1,
     flexDirection: "row",
     flexWrap: "nowrap",
-    justifyContent: "center",
+    justifyContent: 'center',
     textAlignVertical: 'bottom',
-    textDecorationLine: 'underline',
-    fontSize: 20,
-    width: 35,
-    height: 30,
+    fontSize: 18,
+    //padding: 10,
+    height: '100%',
+    //width: '20%',
     color: 'black',
     backgroundColor: 'ghostwhite',
+    //backgroundColor: 'hotpink',
+  },
+  textInput: {
+    textDecorationLine: 'underline',
   },
   spacer: {
-    justifyContent: "center",
     textDecorationLine: 'none',
     backgroundColor: 'ghostwhite',
-    width: 35,
+    //width: '5%',
   },
   buttons: {
-    flex: 9,
+    flex: 8,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: 'flex-end',
-    marginTop: 10,
+    //marginTop: 10,
     width: 400,
-    backgroundColor: 'dimgrey',
+    backgroundColor: 'lightgrey',
   }
 });
 
