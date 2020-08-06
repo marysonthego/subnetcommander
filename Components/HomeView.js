@@ -54,9 +54,9 @@ const HomeView = ({ navigation }) => {
               selectTextOnFocus={true}
               selectionColor="gainsboro"
               keyboardType='numeric'
-              textAlign='left'
+              textAlign='right'
               placeholder={item.value}
-              placeholderTextColor='grey'
+              placeholderTextColor='lightgray'
               blurOnSubmit={false}
               autoFocus={item.id === 0 ? true : false}
               maxLength={item.type === 'octet' ? 3 : 2}
@@ -70,9 +70,16 @@ const HomeView = ({ navigation }) => {
               }}
               onSubmitEditing={(event) => {
                 next=(item.id < 4 ? item.id + 1 : item.id);
-                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.text= ${event.nativeEvent.text} next = ${next}`);
-                 refArray[next].current.focus();
-                handleToggleComplete({ id: item.id, value: event.nativeEvent.text });
+
+                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
+
+                let text = new String(event.nativeEvent.text.padStart(item.maxLength, '0'));
+
+                refArray[item.id].current.value=text;
+                console.log(`current.value = ${refArray[item.id].current.value} text = ${text}`);
+
+                refArray[next].current.focus();
+                handleToggleComplete({ id: item.id, value: text });
               }}
             />
             <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
