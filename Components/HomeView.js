@@ -54,7 +54,7 @@ const HomeView = ({ navigation }) => {
   
     var next =0;
     console.log(`\nBuildInput initialAddress = ${JSON.stringify(initialAddress)}`);
-    (address ? null : address.from(initialAddress));
+    (!address && address.from(initialAddress));
     console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
 
     const handleToggleComplete = ({ id, text }) => {
