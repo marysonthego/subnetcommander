@@ -1,6 +1,6 @@
 import React, { useState, useRef, createRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
-import { onChange } from 'react-native-reanimated';
+//import { onChange } from 'react-native-reanimated';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
@@ -8,55 +8,64 @@ const onPressComplete = () => {
 };
 
 const HomeView = ({ navigation }) => {
-  var addressArray = [];
+ 
   var refArray = [useRef(null),
                       useRef(null),
                       useRef(null),
                       useRef(null),
                       useRef(null),];
 
-  const [addressState, setAddressState] = useState(initialAddressArray);
-  const [addressObj, setAddressObj] = useState(addressState);
+ 
 
-  const updateAddress = ({ id, value }) => {
-    console.log(`\n\nupdateAddress id = ${id} value = ${value}`);
+  // const updateAddress = ({ id, value }) => {
+  //   console.log(`\nupdateAddress id = ${id} value = ${value}`);
+  //   setAddress(({id, value}) => {
+  //     address[id].value = value; 
+  //   })
+  //   console.log(`\n\nsetAddressPart = ${JSON.stringify(address[id])}`);
+  // };
 
-    setAddressObj(({id, value}) => {addressState.map((item) => { 
-      if (item.id === id) {
-        item.value = value};}
-      )});
-    console.log(`\n\nupdateAddress addressObj = ${JSON.stringify(addressState)}`);
-  };
-
-  //useLayoutEffect(() => {
-    //setAddressState(initialAddressArray);
+  //useEffect(() => {
+    //BuildInput();
     //console.log(`\nuseLayoutEffect setAddressState`);
-  //}, []);
+  //}, [address]);
 
-  const onChange = ({id, text}) => {
-      
-      let value = text.replace(/[^0-9]/g, '0');
-      console.log(`\nonChange id = ${id} text = ${text} newText = ${value}`);
-      updateAddress({id, value});
-  }
+  //const handleToggleComplete = ({ id, text }) => {
+    //let value = text.replace(/[^0-9]/g, '0');
+    //setAddress (prevAddress => address.map(item => ({...item, value: value})));
+//}
 
-  const handleToggleComplete = ({ id, value }) => {
-    console.log('\n\n>>>>> handleToggleComplete');
-    console.log(`\nid= ${id}, value= ${value}, length= ${refArray.length}`);
-    if (value > -1) {
-      updateAddress({ id, value });
-    }
-  };
+  // const onChange = ({id, text}) => {
+  //     let value = text.replace(/[^0-9]/g, '0');
+  //     console.log(`\nonChange id = ${id} text = ${text} newText = ${value}`);
+  //     updateAddress({id, value});
+  // }
+
+  // const handleToggleComplete = ({ id, value }) => {
+  //   console.log('\n>>>>> handleToggleComplete');
+  //   console.log(`\nid= ${id}, value= ${value}, refArray.length= ${refArray.length}`);
+  //   if (value > -1) {
+  //     updateAddressPart({ id, value });
+  //   }
+  // };
 
   const BuildInput = () => {
+    const [address, setAddress] = useState(initialAddress);
+  
     var next =0;
-    (addressState ? addressArray = Array.from(addressState) :
-      addressArray = Array.from(initialAddressArray));
-    var next = 0;
-    console.log(`\nBuildInput \naddressArray = ${JSON.stringify(addressArray)}`);
+    console.log(`\nBuildInput initialAddress = ${JSON.stringify(initialAddress)}`);
+    (address ? null : address.from(initialAddress));
+    console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
+
+    const handleToggleComplete = ({ id, text }) => {
+      let value = text.replace(/[^0-9]/g, '0');
+      setAddress (prevAddress => address.map(item => ({...item, value: value})));
+    };
+
     return (
       <View style={styles.addressRow}>
-        {addressArray.map((item) => (
+       
+        {address.map((item) => (
           <View style={styles.address} key={item.id}>
             <TextInput style={[styles.address, styles.textInput]}
               selectTextOnFocus={true}
@@ -70,23 +79,14 @@ const HomeView = ({ navigation }) => {
               maxLength={item.type === 'octet' ? 3 : 2}
               returnKeyType={item.type === 'octet' ? 'next' : 'done'}
               ref={ref => { refArray[item.id].current = ref }}
-              
               onLayout= {(event) => {
                 autofocus='true';
-
-                console.log(`\n\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id}
-               refArray.length = ${refArray.length}`);
+                console.log(`\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
               }}
-
-              onChangeText = {(text) => { onChange({id: item.id, text: text})}}
-
               onSubmitEditing={(event) => {
                 next=(item.id < 4 ? item.id + 1 : item.id);
-
-                console.log(`\n\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
-
+                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
                 refArray[next].current.focus();
-
                 handleToggleComplete({ id: item.id, value: event.nativeEvent.text });
               }}
 
@@ -98,8 +98,8 @@ const HomeView = ({ navigation }) => {
     );
   };
 
-  const initialAddressParts = {
-    addressPart: [
+  const initialAddress = 
+  [
     {
       id: 0,
       type: 'octet',
@@ -129,7 +129,7 @@ const HomeView = ({ navigation }) => {
       type: 'cidr',
       value: '24',
       spacer: ''
-    }]};
+    }];
 
 
   return (
