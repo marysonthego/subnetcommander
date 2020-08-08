@@ -57,9 +57,13 @@ const HomeView = ({ navigation }) => {
     (!address && address.from(initialAddress));
     console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
 
-    const handleToggleComplete = ({ id, text }) => {
-      let value = text.replace(/[^0-9]/g, '0');
-      setAddress (prevAddress => address.map(item => ({...item, value: value})));
+    const handleToggleComplete = ({ id, value, max }) => {
+      console.log(`handleToggleComplete value = ${value}`);
+      let text = value;
+      while(text.length < max) text = '0' + text;
+      setAddress (prevAddress => address.map((item) => (
+        (item.id === id && {...item, value: text}) 
+          )))
     };
 
     return (
@@ -67,7 +71,8 @@ const HomeView = ({ navigation }) => {
        
         {address.map((item) => (
           <View style={styles.address} key={item.id}>
-            <TextInput style={[styles.address, styles.textInput]}
+            <TextInput style={[styles.address, styles.textInput]} 
+              key={item.id}
               selectTextOnFocus={true}
               selectionColor="gainsboro"
               keyboardType='numeric'
@@ -81,13 +86,13 @@ const HomeView = ({ navigation }) => {
               ref={ref => { refArray[item.id].current = ref }}
               onLayout= {(event) => {
                 autofocus='true';
-                console.log(`\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
+                //console.log(`\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
               }}
               onSubmitEditing={(event) => {
                 next=(item.id < 4 ? item.id + 1 : item.id);
                 console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
                 refArray[next].current.focus();
-                handleToggleComplete({ id: item.id, value: event.nativeEvent.text });
+                handleToggleComplete({ id: item.id, value: event.nativeEvent.text, max: item.maxLength });
               }}
 
             />
