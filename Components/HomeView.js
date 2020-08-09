@@ -51,19 +51,24 @@ const HomeView = ({ navigation }) => {
 
   const BuildInput = () => {
     const [address, setAddress] = useState(initialAddress);
-  
+    //setAddress(initialAddress);
+    var newAddress = [];
     var next =0;
-    console.log(`\nBuildInput initialAddress = ${JSON.stringify(initialAddress)}`);
-    (!address && address.from(initialAddress));
-    console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
+    //console.log(`\nBuildInput initialAddress = ${JSON.stringify(initialAddress)}`);
+    //(!address && address.from(initialAddress));
+    //console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
 
     const handleToggleComplete = ({ id, value, max }) => {
-      console.log(`handleToggleComplete value = ${value}`);
+      console.log(`handleToggleComplete id= ${id} value = ${value} max = ${max}`);
       let text = value;
       while(text.length < max) text = '0' + text;
-      setAddress (prevAddress => address.map((item) => (
-        (item.id === id && {...item, value: text}) 
-          )))
+      console.log(`text = ${text}`);
+
+      newAddress = newAddress.from(address);
+      newAddress.map((item) => {
+        (item.id === id ? {...item, value: text} : item)
+      });
+      console.log(`\nBuildInput newAddress = ${JSON.stringify(newAddress)}`);
     };
 
     return (
@@ -72,7 +77,7 @@ const HomeView = ({ navigation }) => {
         {address.map((item) => (
           <View style={styles.address} key={item.id}>
             <TextInput style={[styles.address, styles.textInput]} 
-              key={item.id}
+              //key={item.id}
               selectTextOnFocus={true}
               selectionColor="gainsboro"
               keyboardType='numeric'
@@ -84,21 +89,23 @@ const HomeView = ({ navigation }) => {
               maxLength={item.type === 'octet' ? 3 : 2}
               returnKeyType={item.type === 'octet' ? 'next' : 'done'}
               ref={ref => { refArray[item.id].current = ref }}
-              onLayout= {(event) => {
-                autofocus='true';
+              //onLayout= {(event) => {
+                //autofocus='true';
                 //console.log(`\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
-              }}
+              //}}
               onSubmitEditing={(event) => {
                 next=(item.id < 4 ? item.id + 1 : item.id);
                 console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
+               
+                handleToggleComplete({ id: item.id, value: event.nativeEvent.text, max: refArray[item.id].current.NativeProps.maxLength });
                 refArray[next].current.focus();
-                handleToggleComplete({ id: item.id, value: event.nativeEvent.text, max: item.maxLength });
               }}
 
             />
             <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
           </View>
         ))}
+         {setAddress(newAddress)}
       </View>
     );
   };
