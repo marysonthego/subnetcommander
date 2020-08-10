@@ -1,10 +1,8 @@
 import React, { useState, useRef, createRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
-//import { onChange } from 'react-native-reanimated';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
-
 };
 
 const HomeView = ({ navigation }) => {
@@ -15,69 +13,51 @@ const HomeView = ({ navigation }) => {
                       useRef(null),
                       useRef(null),];
 
- 
-
-  // const updateAddress = ({ id, value }) => {
-  //   console.log(`\nupdateAddress id = ${id} value = ${value}`);
-  //   setAddress(({id, value}) => {
-  //     address[id].value = value; 
-  //   })
-  //   console.log(`\n\nsetAddressPart = ${JSON.stringify(address[id])}`);
-  // };
-
-  //useEffect(() => {
-    //BuildInput();
-    //console.log(`\nuseLayoutEffect setAddressState`);
-  //}, [address]);
-
-  //const handleToggleComplete = ({ id, text }) => {
-    //let value = text.replace(/[^0-9]/g, '0');
-    //setAddress (prevAddress => address.map(item => ({...item, value: value})));
-//}
-
-  // const onChange = ({id, text}) => {
-  //     let value = text.replace(/[^0-9]/g, '0');
-  //     console.log(`\nonChange id = ${id} text = ${text} newText = ${value}`);
-  //     updateAddress({id, value});
-  // }
-
-  // const handleToggleComplete = ({ id, value }) => {
-  //   console.log('\n>>>>> handleToggleComplete');
-  //   console.log(`\nid= ${id}, value= ${value}, refArray.length= ${refArray.length}`);
-  //   if (value > -1) {
-  //     updateAddressPart({ id, value });
-  //   }
-  // };
-
   const BuildInput = () => {
-    const [address, setAddress] = useState(initialAddress);
-    //setAddress(initialAddress);
+    const [address, setAddress] = useState([initialAddress]);
     var newAddress = [];
     var next =0;
-    //console.log(`\nBuildInput initialAddress = ${JSON.stringify(initialAddress)}`);
-    //(!address && address.from(initialAddress));
-    //console.log(`\nBuildInput address = ${JSON.stringify(address)}`);
+   
+    const handleToggleComplete = ({ id, value}) => {
 
-    const handleToggleComplete = ({ id, value, max }) => {
-      console.log(`handleToggleComplete id= ${id} value = ${value} max = ${max}`);
+      console.log(`handleToggleComplete id= ${id} value = ${value}`);
+
       let text = value;
-      while(text.length < max) text = '0' + text;
-      console.log(`text = ${text}`);
+      while(text.length < 3) text = "0" + text;
 
-      newAddress = newAddress.from(address);
-      newAddress.map((item) => {
-        (item.id === id ? {...item, value: text} : item)
-      });
-      console.log(`\nBuildInput newAddress = ${JSON.stringify(newAddress)}`);
+      console.log(`\ntext = ${text} \naddress = ${JSON.stringify(address)} \ninitialAddress = ${JSON.stringify(initialAddress)}`);
+
+      newAddress= Array.from(address);
+      let changed = 0;
+
+      newAddress = newAddress.map((item) => {
+        if(item.id === id) {
+          if (item.value === text) {
+            changed--;
+            return item;
+          } 
+          else { 
+              if (item.value !== text) {
+                changed++;
+                return item = {...item, value: text};
+              } 
+          }
+        }
+        else return item;
+        }
+      );
+
+      console.log(`\nhandleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed}`);
+
+      (changed > -5 && setAddress(prevAddress =>  {return {...prevAddress, ...newAddress};
+      }))
     };
 
     return (
-      <View style={styles.addressRow}>
-       
+      <View style={styles.addressRow}> 
         {address.map((item) => (
-          <View style={styles.address} key={item.id}>
-            <TextInput style={[styles.address, styles.textInput]} 
-              //key={item.id}
+          <View style={styles.address} >
+            <TextInput key={item.id} style={[styles.address, styles.textInput]} 
               selectTextOnFocus={true}
               selectionColor="gainsboro"
               keyboardType='numeric'
@@ -89,23 +69,17 @@ const HomeView = ({ navigation }) => {
               maxLength={item.type === 'octet' ? 3 : 2}
               returnKeyType={item.type === 'octet' ? 'next' : 'done'}
               ref={ref => { refArray[item.id].current = ref }}
-              //onLayout= {(event) => {
-                //autofocus='true';
-                //console.log(`\nonLayout refArray[item.id].current._nativeTag = ${JSON.stringify(refArray[item.id].current._nativeTag)} item.id = ${item.id} refArray.length = ${refArray.length}`);
-              //}}
               onSubmitEditing={(event) => {
                 next=(item.id < 4 ? item.id + 1 : item.id);
-                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next}`);
-               
-                handleToggleComplete({ id: item.id, value: event.nativeEvent.text, max: refArray[item.id].current.NativeProps.maxLength });
+                let id = item.id;
+                console.log(`\nonSubmitEditing id= ${item.id} nativeEvent.input= ${event.nativeEvent.text} next = ${next} `);
+                handleToggleComplete({ id: item.id, value: event.nativeEvent.text});
                 refArray[next].current.focus();
               }}
-
             />
             <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
           </View>
         ))}
-         {setAddress(newAddress)}
       </View>
     );
   };
@@ -143,7 +117,6 @@ const HomeView = ({ navigation }) => {
       spacer: ''
     }];
 
-
   return (
     <View style={styles.container}>
       <BuildInput />
@@ -166,33 +139,24 @@ const styles = StyleSheet.create({
     flexWrap: "nowrap",
     padding: 10,
     justifyContent: "flex-start",
-    //alignItems: "flex-start",
     backgroundColor: 'grey',
   },
   addressRow: {
-    //flex: 1,
     flexDirection: "row",
     flexWrap: "nowrap",
-    //padding: 10,
     height: 40,
-    //width: '75%',
     justifyContent: "flex-start",
-    //backgroundColor: 'dimgrey',
     backgroundColor: 'cyan',
   },
   address: {
-    //flex: 1,
     flexDirection: "row",
     flexWrap: "nowrap",
     justifyContent: 'center',
     textAlignVertical: 'bottom',
     fontSize: 18,
-    //padding: 10,
     height: '100%',
-    //width: '20%',
     color: 'black',
     backgroundColor: 'ghostwhite',
-    //backgroundColor: 'hotpink',
   },
   textInput: {
     textDecorationLine: 'underline',
@@ -200,14 +164,12 @@ const styles = StyleSheet.create({
   spacer: {
     textDecorationLine: 'none',
     backgroundColor: 'ghostwhite',
-    //width: '5%',
   },
   buttons: {
     flex: 8,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: 'flex-end',
-    //marginTop: 10,
     width: 400,
     backgroundColor: 'lightgrey',
   }
