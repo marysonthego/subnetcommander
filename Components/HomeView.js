@@ -68,8 +68,7 @@ const HomeView = ({ navigation }) => {
 
   console.log(`\nHomeView \nnewAddress = ${JSON.stringify(newAddress)}`);
 
-  const BuildInput = () => {
- ////
+   ////
  const handleToggleComplete = ({ id, value }) => {
 
   console.log(`\nhandleToggleComplete \nid= ${id} value = ${value}`);
@@ -102,6 +101,8 @@ const HomeView = ({ navigation }) => {
   return newAddress;
 };
 ////
+  const BuildInput = () => {
+
     //const [anAddress, updateAddress] = useAddress();
     const [address, setAddress] = useState(initialAddress);
 
