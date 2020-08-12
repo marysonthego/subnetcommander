@@ -85,7 +85,7 @@ const HomeView = ({ navigation }) => {
       else return item;
     });
 
-    console.log(`\nEND handleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} newAddress.value = ${newAddress.value}`);
+    console.log(`\nEND handleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} `);
 
     return newAddress;
   };
@@ -110,13 +110,12 @@ const HomeView = ({ navigation }) => {
               selectionColor="gainsboro"
               keyboardType='numeric'
               textAlign='right'
-              placeholder={item.value}
-              placeholderTextColor='lightgray'
+              placeholder={initialAddress[item.id].value}
+              placeholderTextColor='grey'
               blurOnSubmit={false}
               autoFocus={item.id === 0 ? true : false}
               maxLength={item.type === 'octet' ? 3 : 2}
               returnKeyType={item.type === 'octet' ? 'next' : 'done'}
-
               ref={ref => { refArray[item.id].current = ref }}
               
               onSubmitEditing={(event) => {
@@ -125,11 +124,9 @@ const HomeView = ({ navigation }) => {
                 console.log(`\nonSubmitEditing \nid= ${item.id} \nnativeEvent.text= ${event.nativeEvent.text} \nnext = ${next} `);
                 
                 handleToggleComplete({ id: item.id, value: event.nativeEvent.text});
-
-                setAddress (newAddress);
-               
-                console.log(`\nBack from handleToggleComplete\nitem.id = ${item.id} next= ${next} changed = ${changed} \nnewAddress = ${JSON.stringify(newAddress)}`)
-               
+                
+                setAddress(newAddress);
+                
                 refArray[next].current.focus();
 
                 console.log(`\nEND onSubmitEditing \nitem.id = ${item.id} next = ${next} changed = ${changed}`);
@@ -146,10 +143,10 @@ const HomeView = ({ navigation }) => {
     <View style={styles.container}>
       <BuildInput />
       <View style={styles.buttons}>
-        <Button title="Submit" color="grey"
+        <Button title="Submit" color="#00b8d4"
           onPress={() => onPressComplete()}>
         </Button>
-        <Button title="Details" color="grey"
+        <Button title="Details" color="#00b8d4"
           onPress={() => navigation.navigate("Details")}>
         </Button>
       </View>
@@ -164,39 +161,41 @@ const styles = StyleSheet.create({
     flexWrap: "nowrap",
     padding: 10,
     justifyContent: "flex-start",
-    backgroundColor: 'grey',
+    backgroundColor: '#e1f5fe',
   },
   addressRow: {
     flexDirection: "row",
     flexWrap: "nowrap",
     height: 40,
     justifyContent: "flex-start",
-    backgroundColor: 'cyan',
+    backgroundColor: '#e1f5fe',
   },
   address: {
     flexDirection: "row",
     flexWrap: "nowrap",
     justifyContent: 'center',
     textAlignVertical: 'bottom',
-    fontSize: 18,
+    fontSize: 20,
     height: '100%',
     color: 'black',
-    backgroundColor: 'ghostwhite',
+    backgroundColor: '#62ebff',
   },
   textInput: {
+    color: 'black',
     textDecorationLine: 'underline',
   },
   spacer: {
     textDecorationLine: 'none',
-    backgroundColor: 'ghostwhite',
+    backgroundColor: '#62ebff',
   },
   buttons: {
     flex: 8,
     flexDirection: "row",
+    flexWrap: "nowrap",
     justifyContent: "space-evenly",
     alignItems: 'flex-end',
-    width: 400,
-    backgroundColor: 'lightgrey',
+    fontWeight: 'bold',
+    backgroundColor: '#afc2cb',
   }
 });
 
