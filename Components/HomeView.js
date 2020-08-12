@@ -1,18 +1,9 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
 };
-
-// const useAddress = (newAddress = HomeView.initialAddress) => {
-//   const [address, setAddress] = useState(newAddress);
-//   const {current: changeAddress} = 
-//     useRef(function changeAddress(newAddress = []) {
-//       setAddress(newAddress);
-//     });
-//   return [address, changeAddress];
-// };
 
 const HomeView = ({ navigation }) => {
   var init = true,
@@ -68,52 +59,46 @@ const HomeView = ({ navigation }) => {
 
   console.log(`\nHomeView \nnewAddress = ${JSON.stringify(newAddress)}`);
 
-   ////
- const handleToggleComplete = ({ id, value }) => {
+ ////
+  const handleToggleComplete = ({ id, value }) => {
 
-  console.log(`\nhandleToggleComplete \nid= ${id} value = ${value}`);
+    console.log(`\nSTART handleToggleComplete \nid= ${id} value = ${value}`);
 
-  let text = value;
+    let text = value;
 
-  while (text.length < 3) text = "0" + text;
+    while (text.length < 3) text = "0" + text;
 
-  console.log(`\ntext = ${text}`);
- 
-  changed = 0;
+    changed = 0;
 
-  newAddress = newAddress.map((item) => {
-    if (item.id === id) {
-      if (item.value === text) {
-        return item;
-      }
-      else {
-        if (item.value !== text) {
-          changed++;
-          return item = { ...item, value: text };
+    newAddress = newAddress.map((item) => {
+      if (item.id === id) {
+        if (item.value === text) {
+          return item;
+        }
+        else {
+          if (item.value !== text) {
+            changed++;
+            return item = { ...item, value: text };
+          }
         }
       }
-    }
-    else return item;
-  });
+      else return item;
+    });
 
-  console.log(`\nEND handleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed}`);
+    console.log(`\nEND handleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} newAddress.value = ${newAddress.value}`);
 
-  return newAddress;
-};
+    return newAddress;
+  };
 ////
   const BuildInput = () => {
 
-    //const [anAddress, updateAddress] = useAddress();
     const [address, setAddress] = useState(initialAddress);
 
-    console.log(`\nSTART BuildInput \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} next = ${next}`);
+    console.log(`\nSTART BuildInput newAddress \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} next = ${next}`);
 
-    console.log(`\nSTART BuildInput \naddress = ${JSON.stringify(address)} \nchanged = ${changed} next = ${next}`);
+    console.log(`\nSTART BuildInput address \naddress = ${JSON.stringify(address)} \nchanged = ${changed} next = ${next}`);
 
-    if (changed > 0) {
-     // setAddress(newAddress);
-      changeed = 0;
-    } 
+    changeed = 0;
 
     return (
       <View style={styles.addressRow}>
@@ -134,17 +119,14 @@ const HomeView = ({ navigation }) => {
 
               ref={ref => { refArray[item.id].current = ref }}
               
-             //{...newAddress = Array.from(useAddress())}
-              
               onSubmitEditing={(event) => {
                 next = (item.id < 4 ? item.id + 1 : item.id);
                 
                 console.log(`\nonSubmitEditing \nid= ${item.id} \nnativeEvent.text= ${event.nativeEvent.text} \nnext = ${next} `);
                 
                 handleToggleComplete({ id: item.id, value: event.nativeEvent.text});
-                setAddress (newAddress);
 
-                //setAddress ((newAddress) => {(handleToggleComplete({ id: item.id, value: event.nativeEvent.text}))});
+                setAddress (newAddress);
                
                 console.log(`\nBack from handleToggleComplete\nitem.id = ${item.id} next= ${next} changed = ${changed} \nnewAddress = ${JSON.stringify(newAddress)}`)
                
