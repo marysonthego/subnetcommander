@@ -44,7 +44,6 @@ const initialAddress =
   spacer: ''
 }];
 
-
 const HomeView = ({ navigation }) => {
 
       if (init) {
@@ -73,41 +72,45 @@ const HomeView = ({ navigation }) => {
 
 const ValidateInput = (props) => {
 
-  console.log(`\nValidateInput \nprops.item: ${JSON.stringify(props.item)} \nprops.text: ${JSON.stringify(props.text)}`)  
+  console.log(`\nValidateInput \nprops.item: ${JSON.stringify(props.item)} \nprops.text: ${JSON.stringify(props.text)}`);
+
   var newText = props.text;
-  console.log(`\nValidateInput \nnewText = ${newText}`);
   var newItem = props.item;
   let num = ~~newText;
   let len = 0;
-  if (newItem.type === 'octet') {
+  
+  if (newItem.type.localeCompare('octet') === 0) {
     len = 3;
     if (num < 0 || num > 255) {
       newText = '000';
       errMsg = "Error: number must be between 0 and 255 inclusive."
     }
   }
-  else { 
+  else if (newItem.type.localeCompare('cidr') === 0) {
     if(num < 0 || num > 31) {
       len = 2;
       newText = '00';
       errMsg = "Error: CIDR mask must be between 0 and 31 inclusive."
     }
   }
-  
   while (newText.length < len) newText = "0" + newText;
   
   newItem.value = newText;
+
   console.log(`\nnewText = ${newText} newText.length = ${newText.length} newItem.value = ${newItem.value}`);
+
   updateAddress({item: newItem});
+  
   return (newText);
 };
 
 const updateAddress = ({ item }) => {
   
-  console.log(`\nupdateAddress`);
+  console.log(`\nupdateAddress item.id: ${item.id} item.value: ${item.value}`);
+  
   changed = 0;
   newAddress = newAddress.map((obj) => {
-    console.log(`obj.id: ${obj.id} obj.value: ${obj.value} item.id: ${item.id} item.value: ${item.value}`);
+    console.log(`obj.id: ${obj.id} obj.value: ${obj.value}`);
     if (obj.id === item.id) {
       if (obj.value.localeCompare(item.value) === 0) {
         return obj;
@@ -116,18 +119,16 @@ const updateAddress = ({ item }) => {
         if (obj.value.localeCompare(item.value) !== 0) {
           changed++;
           obj = { ...obj, value: item.value };
-          console.log(`changed = ${changed} obj.value = ${obj.value}`);
+          console.log(`\nnewAddress changed = ${changed} obj.value = ${obj.value}`);
           return obj;
         }
       }
     }
     else return obj;
   });
-  console.log(`\nupdateAddress item.value: ${item.value} changed: ${changed}`);
 };
 
 const BuildInput = () => {
-
  
   const [address, setAddress] = useState(initialAddress);
   var newText = '';
@@ -142,6 +143,7 @@ const BuildInput = () => {
   const updateValue = ({newText, item}) => {
     refArray[item.id].current.setNativeProps({text: newText});
  };
+
   console.log(`\nBuildinput address:\n${JSON.stringify(address)}`);
 
   return (
@@ -151,8 +153,8 @@ const BuildInput = () => {
         <TextInput    
           ref={component => refArray[item.id].current = component}
           item={item}
+
           onChangeText={text => { 
-            //newText = ValidateInput({item: item, text: text});
             updateValue({newText: text, item: item});
           }}
          
