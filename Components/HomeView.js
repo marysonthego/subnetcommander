@@ -152,17 +152,18 @@ const BuildInput = () => {
           ref={component => refArray[item.id].current = component}
           item={item}
           onChangeText={text => { 
-            newText = ValidateInput({item: item, text: text});
-            updateValue({newText: newText, item: item});
+            //newText = ValidateInput({item: item, text: text});
+            updateValue({newText: text, item: item});
           }}
          
           onSubmitEditing={event => {
             console.log(`\nonSubmitEditing\n`);
+            newText = ValidateInput({item: item, text: event.nativeEvent.text});
+            updateValue({newText: newText, item: item});
             next = (item.id < 4 ? item.id + 1 : item.id);
             refArray[next].current.focus();
             setAddress(address.map((a) => {
               if (a === item ) {
-                //item.value = event.nativeEvent.text;
                 item.value = newText;
                 return {...item, value: newText};
               }
