@@ -1,54 +1,51 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
 };
 
+var init = true,
+changed,
+next,
+newAddress,
+errMsg;
+
+const initialAddress =
+[
+{
+  id: 0,
+  type: 'octet',
+  value: '192',
+  spacer: '.'
+},
+{
+  id: 1,
+  type: 'octet',
+  value: '168',
+  spacer: '.'
+},
+{
+  id: 2,
+  type: 'octet',
+  value: '000',
+  spacer: '.'
+},
+{
+  id: 3,
+  type: 'octet',
+  value: '001',
+  spacer: '/'
+},
+{
+  id: 4,
+  type: 'cidr',
+  value: '24',
+  spacer: ''
+}];
+
+
 const HomeView = ({ navigation }) => {
-  var init = true,
-      changed,
-      next,
-      newAddress;
-
-  var refArray = [useRef(null),
-  useRef(null),
-  useRef(null),
-  useRef(null),
-  useRef(null)];
-
-  const initialAddress =
-    [
-      {
-        id: 0,
-        type: 'octet',
-        value: '192',
-        spacer: '.'
-      },
-      {
-        id: 1,
-        type: 'octet',
-        value: '168',
-        spacer: '.'
-      },
-      {
-        id: 2,
-        type: 'octet',
-        value: '000',
-        spacer: '.'
-      },
-      {
-        id: 3,
-        type: 'octet',
-        value: '001',
-        spacer: '/'
-      },
-      {
-        id: 4,
-        type: 'cidr',
-        value: '24',
-        spacer: ''
-      }];
 
       if (init) {
         changed = 0;
@@ -56,89 +53,9 @@ const HomeView = ({ navigation }) => {
         newAddress = initialAddress.slice();
         init = false;
       }
-
-  console.log(`\nHomeView \nnewAddress = ${JSON.stringify(newAddress)}`);
-
- ////
-  const handleToggleComplete = ({ id, value }) => {
-
-    console.log(`\nSTART handleToggleComplete \nid= ${id} value = ${value}`);
-
-    let text = value;
-
-    while (text.length < 3) text = "0" + text;
-
-    changed = 0;
-
-    newAddress = newAddress.map((item) => {
-      if (item.id === id) {
-        if (item.value === text) {
-          return item;
-        }
-        else {
-          if (item.value !== text) {
-            changed++;
-            return item = { ...item, value: text };
-          }
-        }
-      }
-      else return item;
-    });
-
-    console.log(`\nEND handleToggleComplete \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} `);
-
-    return newAddress;
-  };
-////
-  const BuildInput = () => {
-
-    const [address, setAddress] = useState(initialAddress);
-
-    console.log(`\nSTART BuildInput newAddress \nnewAddress = ${JSON.stringify(newAddress)} \nchanged = ${changed} next = ${next}`);
-
-    console.log(`\nSTART BuildInput address \naddress = ${JSON.stringify(address)} \nchanged = ${changed} next = ${next}`);
-
-    changeed = 0;
-
-    return (
-      <View style={styles.addressRow}>
-        {address.map((item) => (
-          <View style={styles.address} key={item.id.toString()}>
-            <TextInput 
-              style={[styles.address, styles.textInput]}
-              selectTextOnFocus={true}
-              selectionColor="gainsboro"
-              keyboardType='numeric'
-              textAlign='right'
-              placeholder={initialAddress[item.id].value}
-              placeholderTextColor='grey'
-              blurOnSubmit={false}
-              autoFocus={item.id === 0 ? true : false}
-              maxLength={item.type === 'octet' ? 3 : 2}
-              returnKeyType={item.type === 'octet' ? 'next' : 'done'}
-              ref={ref => { refArray[item.id].current = ref }}
-              
-              onSubmitEditing={(event) => {
-                next = (item.id < 4 ? item.id + 1 : item.id);
-                
-                console.log(`\nonSubmitEditing \nid= ${item.id} \nnativeEvent.text= ${event.nativeEvent.text} \nnext = ${next} `);
-                
-                handleToggleComplete({ id: item.id, value: event.nativeEvent.text});
-                
-                setAddress(newAddress);
-                
-                refArray[next].current.focus();
-
-                console.log(`\nEND onSubmitEditing \nitem.id = ${item.id} next = ${next} changed = ${changed}`);
-              }}
-            />
-            <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
-
+    
+  console.log(`\nHomeView init = ${init}\nnewAddress = ${JSON.stringify(newAddress)}`);
+ 
   return (
     <View style={styles.container}>
       <BuildInput />
@@ -151,6 +68,112 @@ const HomeView = ({ navigation }) => {
         </Button>
       </View>
     </View >
+  );
+};
+
+const ValidateInput = (props) => {
+  console.log(`ValidateInput props: ${JSON.stringify(props)}`)  
+  var newText = props.item.value;
+  console.log(`\nValidateInput \nnewText = ${newText}`);
+  var newItem = props.item;
+  let num = ~~newText;
+  let len = 0;
+  if (newItem.type === 'octet') {
+    len = 3;
+    if (num < 0 || num > 255) {
+      newText = '000';
+      errMsg = "Error: number must be between 0 and 255 inclusive."
+    }
+  }
+  else { 
+    if(num < 0 || num > 31) {
+      len = 2;
+      newText = '00';
+      errMsg = "Error: CIDR mask must be between 0 and 31 inclusive."
+    }
+  }
+  console.log(`newText = ${newText} newText.length = ${newText.length}`);
+  while (newText.length < len) newText = "0" + newText;
+  newItem.value = newText;
+  updateAddress({text: newText, item: newItem});
+  return (
+  <TextInput {...props} ref={props.inputRef} 
+    style={[styles.address, styles.textInput]}
+    placeholder={initialAddress[props.item.id].value}
+    autoFocus={props.item.id === 0 ? true : false}
+    maxLength={props.item.type === 'octet' ? 3 : 2}
+    returnKeyType={props.item.type === 'octet' ? 'next' : 'done'}
+    selectTextOnFocus={true}
+    selectionColor="gainsboro"
+    keyboardType='numeric'
+    textAlign='right'
+    placeholderTextColor='grey'
+    blurOnSubmit={false}
+    />
+  );
+  };
+
+const updateAddress = ({ text, item }) => {
+  
+  console.log(`\nupdateAddress \ntext= ${text}`);
+  changed = 0;
+  newAddress = newAddress.map((obj) => {
+    console.log(`obj.id: ${obj.id} item.id: ${item.id}`);
+    if (obj.id === item.id) {
+      if (obj.value === text) {
+        return obj;
+      }
+      else {
+        if (obj.value !== text) {
+          changed++;
+          obj = { ...obj, value: text };
+          console.log(`changed = ${changed} obj.value = ${obj.value} text = ${text}`);
+          return obj;
+        }
+      }
+    }
+    else return obj;
+  });
+  console.log(`\nupdateAddress \ntext= ${text} changed = ${changed}`);
+};
+
+const BuildInput = () => {
+
+  inputItem = useRef();
+  const [address, setAddress] = useState(initialAddress);
+  
+  console.log(`\nBuildinput address:\n${JSON.stringify(address)}`);
+  var refArray = [useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null)];
+  changeed = 0;
+  return (
+    <View style={styles.addressRow}>
+      {address.map((item) => (
+        <View style={styles.address} key={item.id.toString()}>
+        <ValidateInput 
+          inputRef={inputItem} 
+          item={item}
+          inputRef={inputRef => { refArray[item.id].current = inputRef }}
+          onSubmitEditing={event => {
+            console.log(`\nonSubmitEditing`);
+            next = (item.id < 4 ? item.id + 1 : item.id);
+            refArray[next].current.focus();
+            setAddress(address.map((a) => {
+              if (a === item ) {
+                item.value = event.nativeEvent.text;
+                return {...item, value: event.nativeEvent.text};
+              }
+              return a;
+            }))
+          }}
+        />
+        <Text style={[styles.address, styles.spacer]}>{item.spacer}</Text>
+        </View>
+      ))}
+    </View>
   );
 };
 
