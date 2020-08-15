@@ -14,9 +14,9 @@ function NavStack() {
         screenOptions={{
           headerTitleAlign: 'left',
           headerStyle: {
-            backgroundColor: '#e1f5fe',
+            backgroundColor: '#1a237e',
           },
-          headerTintColor: '#000000',
+          headerTintColor: '#fff',
           headerTitleStyle :{
             fontWeight: 'normal',
           },

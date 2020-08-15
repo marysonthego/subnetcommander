@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
+import { Octicons, AntDesign, FontAwesome } from '@expo/vector-icons';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
@@ -58,13 +59,13 @@ const HomeView = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <BuildInput />
+      <AntDesign name="enviroment" size={24} color="#1a237e" />
+      <View style={styles.decal}>
+        <FontAwesome name="superpowers" size={99} color="#1a237e" />
+      </View>
       <View style={styles.buttons}>
-        <Button title="Submit" color="#00b8d4"
-          onPress={() => onPressComplete()}>
-        </Button>
-        <Button title="Details" color="#00b8d4"
-          onPress={() => navigation.navigate("Details")}>
-        </Button>
+        <FontAwesome.Button name="check-circle-o" size={24} color="white" backgroundColor="#1a237e" onPress={() => navigation.navigate("Details")}>SAVE</FontAwesome.Button>
+        <FontAwesome.Button name="list-ol" size={24} color="white" backgroundColor="#1a237e" onPress={() => navigation.navigate("Details")}>DETAILS</FontAwesome.Button>
       </View>
     </View >
   );
@@ -198,14 +199,14 @@ const styles = StyleSheet.create({
     flexWrap: "nowrap",
     padding: 10,
     justifyContent: "flex-start",
-    backgroundColor: '#e1f5fe',
+    backgroundColor: '#e0e0e0',
   },
   addressRow: {
     flexDirection: "row",
     flexWrap: "nowrap",
-    height: 40,
+    height: 30,
     justifyContent: "flex-start",
-    backgroundColor: '#e1f5fe',
+    backgroundColor: '#e0e0e0',
   },
   address: {
     flexDirection: "row",
@@ -213,9 +214,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlignVertical: 'bottom',
     fontSize: 20,
-    height: '100%',
+    fontWeight: "bold",
+    fontFamily: "Roboto",
+    //height: '100%',
     color: 'black',
-    backgroundColor: '#62ebff',
+    backgroundColor: '#f5f5f5',
   },
   textInput: {
     color: 'black',
@@ -223,16 +226,25 @@ const styles = StyleSheet.create({
   },
   spacer: {
     textDecorationLine: 'none',
-    backgroundColor: '#62ebff',
+    backgroundColor: '#f5f5f5',
+  },
+  decal: {
+    flex: 6,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: '#e0e0e0',
   },
   buttons: {
-    flex: 8,
+    flex: 1,
     flexDirection: "row",
     flexWrap: "nowrap",
     justifyContent: "space-evenly",
     alignItems: 'flex-end',
+    fontSize: 24,
     fontWeight: 'bold',
-    backgroundColor: '#afc2cb',
+    fontFamily: "Roboto",
+    backgroundColor: '#e0e0e0',
   }
 });
 
