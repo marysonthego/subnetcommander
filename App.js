@@ -2,6 +2,7 @@ import React from 'react';
 import { AppearanceProvider, useColorScheme } from 'react-native-appearance';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar } from 'expo-status-bar';
 import HomeView from './Components/HomeView';
 import DetailsView from './Components/DetailsView';
 
@@ -37,11 +38,11 @@ function NavStack() {
 }
 
 export default () => {const scheme = useColorScheme();
-
   return (
     <AppearanceProvider>
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <NavStack />
+      <StatusBar style="light" backgroundColor="#0d47a1" />
     </NavigationContainer>
     </AppearanceProvider>
   )};

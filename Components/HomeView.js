@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
-import { Octicons, AntDesign, FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 
 const onPressComplete = () => {
   console.log('onPressComplete');
@@ -59,13 +59,12 @@ const HomeView = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <BuildInput />
-      <AntDesign name="enviroment" size={24} color="#1a237e" />
       <View style={styles.decal}>
         <FontAwesome name="superpowers" size={99} color="#1a237e" />
       </View>
       <View style={styles.buttons}>
-        <FontAwesome.Button name="check-circle-o" size={24} color="white" backgroundColor="#1a237e" onPress={() => navigation.navigate("Details")}>SAVE</FontAwesome.Button>
-        <FontAwesome.Button name="list-ol" size={24} color="white" backgroundColor="#1a237e" onPress={() => navigation.navigate("Details")}>DETAILS</FontAwesome.Button>
+        <FontAwesome.Button name="check-circle-o" size={24} color="white" backgroundColor="#0d47a1" onPress={() => navigation.navigate("Details")}>SAVE</FontAwesome.Button>
+        <FontAwesome.Button name="list-ol" size={24} color="white" backgroundColor="#0d47a1" onPress={() => navigation.navigate("Details")}>DETAILS</FontAwesome.Button>
       </View>
     </View >
   );
