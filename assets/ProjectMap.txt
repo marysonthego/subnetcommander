@@ -1,0 +1,19 @@
+      App 
+        |
+        -----
+            |
+            v
+          NavStack
+            |
+            |
+            ---------------------------------      
+                    |                       |
+                    v                       v
+                  HomeView              DetailsView
+                    |
+          -----------
+          |     
+          v
+      Buildinput
+          |
+          v
