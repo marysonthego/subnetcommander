@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import HomeView from './Components/HomeView';
 import DetailsView from './Components/DetailsView';
+import { myColors } from './assets/style';
 
 const Stack = createStackNavigator();
 
@@ -16,9 +17,9 @@ function NavStack() {
         screenOptions={{
           headerTitleAlign: 'left',
           headerStyle: {
-            backgroundColor: '#1a237e',
+            backgroundColor: myColors.primaryColor,
           },
-          headerTintColor: '#fff',
+          headerTintColor: myColors.primaryTextColor,
           headerTitleStyle :{
             fontWeight: 'normal',
           },
@@ -43,7 +44,7 @@ export default () => {const scheme = useColorScheme();
     <AppearanceProvider>
       <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
         <NavStack />
-        <StatusBar style="light" backgroundColor="#0d47a1" />
+        <StatusBar style="light" backgroundColor = {myColors.primaryDarkColor} />
       </NavigationContainer>
     </AppearanceProvider>
   )};
